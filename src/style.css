@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+/* Light palette. Utilities compile to var(--color-*), so the dark block below
+   swaps them at runtime. */
+@theme {
+  --color-paper: #FBFAF7;
+  --color-ink: #14161A;
+  --color-rule: #A3A49C;
+  --color-quiet: #63655F;
+  --color-accent: #24467E;
+  --color-accent-soft: #E4EAF4;
+  --color-mark: #A8341F;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --font-music: "Noto Music", serif;
+}
+
+/* Unlayered, so it overrides the theme layer's :root values. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #131416;
+    --color-ink: #EDEDE8;
+    --color-rule: #6C6E68;
+    --color-quiet: #A0A29B;
+    --color-accent: #9CB8E6;
+    --color-accent-soft: #22314A;
+    --color-mark: #E08A76;
+  }
+}
+
+@layer base {
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    /* Sits under the notch and above the home indicator on phones. */
+    padding: env(safe-area-inset-top) 20px calc(env(safe-area-inset-bottom) + 24px);
+    max-width: 520px;
+    margin-inline: auto;
+  }
+}

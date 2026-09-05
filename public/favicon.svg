@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Quarter note">
+  <style>
+    /* Mirrors the app palette in src/style.css so the icon follows the browser theme. */
+    :root { --paper: #FBFAF7; --ink: #14161A; }
+    @media (prefers-color-scheme: dark) {
+      :root { --paper: #131416; --ink: #EDEDE8; }
+    }
+  </style>
+  <rect width="64" height="64" fill="var(--paper, #FBFAF7)"/>
+  <!-- Quarter note, shifted right so the head-plus-stem mass sits centred. -->
+  <g transform="translate(5 0)" fill="var(--ink, #14161A)">
+    <rect x="38.5" y="8" width="4.5" height="38" rx="1.5"/>
+    <ellipse cx="26" cy="46" rx="15" ry="11" transform="rotate(-20 26 46)"/>
+  </g>
+</svg>
