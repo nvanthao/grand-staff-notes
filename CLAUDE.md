@@ -9,6 +9,7 @@ npm run dev        # Vite dev server
 npm run typecheck  # vue-tsc --build — the primary correctness gate
 npm run build      # typecheck, then production build to dist/
 npm run preview    # serve dist/ (needed to exercise the service worker)
+npm run screenshots # re-shoot the PWA install screenshots (needs a build first)
 ```
 
 There is no test runner and no linter installed. `npm run typecheck` is the fastest
@@ -57,9 +58,21 @@ cache — without it the glyphs vanish offline.
 - Choice controls use `aria-pressed` buttons driven by Tailwind's `aria-pressed:` variant,
   not radio inputs. `choice-row.vue` is generic over `string | number` — reuse it rather
   than writing another picker.
-- Adding a static asset to `public/` requires two edits in `vite.config.ts`: add it to
-  `includeAssets` and make sure its extension is in the workbox `globPatterns`, or it will
-  not be precached.
-- `favicon.svg` duplicates the palette hex values because an SVG favicon cannot read the
-  app's stylesheet; if the palette changes in `src/style.css`, update the favicon and
-  regenerate `favicon.ico` from it.
+- Adding a static asset to `public/` only needs its extension present in the workbox
+  `globPatterns` in `vite.config.ts`, or it will not be precached. Three settings there exist
+  to stop the same file being precached twice, since every duplicate pair had identical
+  revisions and only inflated the entry count: there is deliberately no `includeAssets` list
+  (everything in `public/` is copied into the build output, where `globPatterns` already
+  matches it), `includeManifestIcons` is `false` (the icons are `public/` files too), and
+  `webmanifest` is absent from `globPatterns` (the plugin always precaches the manifest it
+  generates). `npm run build` prints the entry count — it should equal the number of files.
+- `favicon.svg` and the `theme-color` meta tags in `index.html` duplicate the palette hex
+  values because neither an SVG favicon nor a meta tag can read the app's stylesheet. If the
+  palette changes in `src/style.css`, update both, and regenerate `favicon.ico` from the SVG.
+  The two `theme-color` tags are `media`-gated so browser chrome follows the light and dark
+  palettes; the manifest's single `theme_color` cannot vary and stays light.
+- After a visible UI change, re-run `npm run screenshots`. The manifest's `screenshots`
+  entries declare exact pixel `sizes`, and Chrome silently ignores any entry whose
+  dimensions disagree with the file. The script forces the light colour scheme because
+  headless Chrome otherwise reports a dark `prefers-color-scheme`, which would clash with
+  the manifest's light `background_color`.
