@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+
+  // Deployed as a static-asset-only Worker: there is no `main` entrypoint, so no
+  // Worker script runs and asset requests are not billable invocations.
+  "name": "grand-staff-notes",
+  "compatibility_date": "2026-09-05",
+
+  // `not_found_handling` is deliberately left at its default (`none`, i.e. real 404s).
+  // This is a single screen with no client-side router, so `single-page-application`
+  // mode would only serve index.html with a 200 for every mistyped path; navigations
+  // are already covered once the service worker controls the page, via workbox's
+  // `navigateFallback` in vite.config.ts.
+  //
+  // Cloudflare defaults every asset to `Cache-Control: public, max-age=0,
+  // must-revalidate`, which is what keeps `sw.js` updating. Overriding that for the
+  // content-hashed `/assets/*` bundles belongs in a `_headers` file, not here — and
+  // must never match `sw.js` at the root.
+  "assets": {
+    // `dist/` is gitignored, so `npm run build` has to run before `wrangler deploy`.
+    "directory": "./dist"
+  }
+}

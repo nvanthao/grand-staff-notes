@@ -10,6 +10,7 @@ npm run typecheck  # vue-tsc --build — the primary correctness gate
 npm run build      # typecheck, then production build to dist/
 npm run preview    # serve dist/ (needed to exercise the service worker)
 npm run screenshots # re-shoot the PWA install screenshots (needs a build first)
+npm run deploy     # build, then `wrangler deploy` to Cloudflare Workers
 ```
 
 There is no test runner and no linter installed. `npm run typecheck` is the fastest
@@ -50,6 +51,23 @@ via the `@tailwindcss/vite` plugin.
 Clef glyphs are Unicode musical symbols rendered in the `font-music` family (Google Fonts
 "Noto Music"), which is why `vite.config.ts` gives Google Fonts its own workbox runtime
 cache — without it the glyphs vanish offline.
+
+## Deployment
+
+`wrangler.jsonc` deploys `dist/` to Cloudflare Workers as a **static-asset-only Worker**:
+there is no `main` entrypoint, so no Worker script runs and asset requests are not billable
+invocations. `dist/` is gitignored, which is why `npm run deploy` builds before deploying.
+
+Caching is the part that matters for the service worker. Cloudflare defaults every asset to
+`Cache-Control: public, max-age=0, must-revalidate`, and that default is what lets an
+unhashed root-level `sw.js` pick up a new deploy. `public/_headers` overrides it only for
+the content-hashed `/assets/*` bundles; a broader rule like `/*.js` would match `sw.js` too
+and strand clients on an old service worker. `_headers` has no file extension, so the
+workbox `globPatterns` do not precache it, and Cloudflare parses it rather than serving it.
+
+`not_found_handling` is deliberately unset (real 404s): there is no client-side router, and
+navigations are already covered by workbox's `navigateFallback` once the service worker is
+in control.
 
 ## Conventions
 
